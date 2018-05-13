@@ -1,0 +1,47 @@
+#encoding:utf-8
+import matplotlib.pyplot as plt
+plt.rcParams['font.sans-serif']=['SimHei']
+plt.rcParams['axes.unicode_minus']=False
+import MySQLdb
+import matplotlib
+import matplotlib.pyplot as plt
+try:
+    health = MySQLdb.connect('localhost', 'root', '63749261', 'health', charset='utf8')
+    cur = health.cursor()
+    cur.execute('SELECT 用户标识 FROM adc')
+    id = cur.fetchall()
+    cur.execute('SELECT 体质指标 FROM adc')
+    bmi = cur.fetchall()
+    cur.execute('SELECT 尿糖 FROM adc')
+    sug = cur.fetchall()
+    x = []
+    y = []
+    for j in range(40):
+        x.append(0)
+        y.append(0)
+    for i in range(len(bmi)):
+        if (bmi[i][0] != None):
+            a = int(float(bmi[i][0]))
+            if(a<40):
+                y[a] = y[a] + 1
+                if(sug[i][0] == '+'):
+                    x[a] = x[a] + 1
+    print x
+    print y
+    for k in range(40):
+        if (x[k] != 0):
+            x[k] = x[k] * 1.00 / y[k]
+    print x
+    plt.plot(range(40),x)
+    plt.xticks([0,10,20,30,40])
+    plt.ylim((0,0.02))
+    plt.xlabel(u'体质指标')
+    plt.ylabel(u'尿糖')
+    plt.title(u'体质指标与尿糖的相关性')
+    plt.legend()
+    plt.show()
+except:
+    print "Error: unable to fecth data"
+cur.close()
+health.close()
+
