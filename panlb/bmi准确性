@@ -1,0 +1,34 @@
+#encoding:utf-8
+import matplotlib.pyplot as plt
+plt.rcParams['font.sans-serif']=['SimHei']
+plt.rcParams['axes.unicode_minus']=False
+import MySQLdb
+import matplotlib
+import matplotlib.pyplot as plt
+try:
+    health=MySQLdb.connect('localhost','root','63749261','health',charset='utf8')
+    cur=health.cursor()
+    cur.execute('select 体质指标 from adc')
+    bmi=cur.fetchall()
+    abnormal=0
+    lost=0
+    for i in range(len(bmi)):
+        if(bmi[i][0]!=None):
+            a=int(float(bmi[i][0]))
+            if(a<15):
+                abnormal=abnormal+1
+            if(a>45):
+                abnormal=abnormal+1
+        else:
+            lost=lost+1
+    normal=len(bmi)-abnormal-lost
+    slices=[normal,abnormal,lost]
+    print slices
+    plt.pie(slices,labels=[u'正常',u'异常',u'缺失'],colors=['lightskyblue','pink','tomato'],startangle=90,explode=(0.1,0.2,0), autopct = '%1.1f%%' )
+    plt.title(u'BMI的准确性')
+    plt.legend()
+    plt.show()
+except:
+    print "Error:Unable to fetch data"
+cur.close()
+health.close()
