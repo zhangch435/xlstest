@@ -44,7 +44,20 @@ account2=db2.liuzhe
             #h_tzzb.append(0)
         #else:
             #h_tzzb.append(item[u'体质指标'])  
-
+            
+##将diabete数据库中的身高集录入到d_sg集合中
+#d_sg=[]
+#for item in account1.find():
+    #if item.has_key(u'身高') and item[u'身高']:
+        #if(item[u'身高']>50 and item[u'身高']<200):
+            #d_sg.append(float(item[u'身高']))
+##将health数据库中的高密度脂蛋白集录入到h_sg集合中
+#h_sg=[]
+#for item in account2.find():
+    #if item.has_key(u'身高') and item[u'身高']:
+        #if(item[u'身高']>50 and item[u'身高']<200):
+            #h_sg.append(float(item[u'身高']))
+            
 ##将diabete数据库中的性别集录入到d_sex集合中
 #d_sex=[]
 #for item in account1.find():
@@ -78,6 +91,11 @@ account2=db2.liuzhe
             #h_weight.append(item[u'体重'])     
             
 ##分别合并tzzb集合、sex集合、weight集合以及生成condition集合表示患病个体
+#sg=[]
+#for i in d_sg:
+    #sg.append(i)
+#for i in h_sg:
+    #sg.append(i)
 #tzzb=[]
 #for i in d_tzzb:
     #tzzb.append(i)
@@ -93,16 +111,21 @@ account2=db2.liuzhe
     #weight.append(i)
 #for i in h_weight:
     #weight.append(i)
+#sstzb=[]
+#for x in range(len(weight)):
+    #if(float(sg[x])/weight[x]>8):
+        #sstzb.append(8)
+    #else:
+        #sstzb.append(float(sg[x])/weight[x])
 #condition=[]
 #for i in d_sex:
     #condition.append(1)
 #for i in h_sex:
     #condition.append(0)
-    
 ##将三个数组转化为dataframe格式并合并
 #frame1=pd.DataFrame({u"性别":sex})
 #frame2=pd.DataFrame({u"体质指标":tzzb})
-#frame3=pd.DataFrame({u"体重":weight})
+#frame3=pd.DataFrame({u"身高体重比":sstzb})
 #frame4=pd.DataFrame({u"患病情况":condition})
 #frame5=frame1.join(frame2)
 #frame6=frame5.join(frame3)
@@ -116,9 +139,9 @@ account2=db2.liuzhe
 #sns.violinplot(u"性别",u"体质指标", hue=u"患病情况", data=frame,palette="muted",split=True,ax=ax[0])
 #ax[0].set_title(u'体质指标、性别与患病与否的关系')
 #ax[0].set_yticks(range(0, 50, 10))
-#sns.violinplot(u"性别",u"体重", hue=u"患病情况", data=frame,palette="muted",split=True,ax=ax[1])
-#ax[1].set_title(u'体重、性别与患病与否的关系')
-#ax[1].set_yticks(range(0, 110, 10))
+#sns.violinplot(u"性别",u"身高体重比", hue=u"患病情况", data=frame,palette="muted",split=True,ax=ax[1])
+#ax[1].set_title(u'身高体重比、性别与患病与否的关系')
+#ax[1].set_yticks(range(0, 8, 2))
 #plt.show()
 
 
@@ -488,43 +511,65 @@ account2=db2.liuzhe
 ##plt.show()
 
 
-##做出年龄分布与患病率的关系
-##将diabete数据库中的年龄集录入到d_age集合中
-#d_age=[]
-#for item in account1.find():
-    #if item.has_key(u'年龄') and item[u'年龄']:
-        #if(item[u'年龄']>20 and item[u'年龄']<107):
-            #d_age.append(int(item[u'年龄']))
+#做出年龄分布与患病率的关系
+#将diabete数据库中的年龄集录入到d_age集合中
+d_age=[]
+for item in account1.find():
+    if item.has_key(u'年龄') and item[u'年龄']:
+        if(item[u'年龄']>20 and item[u'年龄']<107):
+            d_age.append(int(item[u'年龄']))
             
-##将health数据库中的年龄集录入到h_age集合中
-#h_age=[]
-#for item in account2.find():
-    #if item.has_key(u'年龄') and item[u'年龄']:
-        #if(item[u'年龄']>20 and item[u'年龄']<107):
-            #h_age.append(int(item[u'年龄']))
+#将health数据库中的年龄集录入到h_age集合中
+h_age=[]
+for item in account2.find():
+    if item.has_key(u'年龄') and item[u'年龄']:
+        if(item[u'年龄']>20 and item[u'年龄']<107):
+            h_age.append(int(item[u'年龄']))
 
-#age=[]
-#for i in d_age:
-    #age.append(i)
-#for i in h_age:
-    #age.append(i)
-#condition=[]
-#for i in d_age:
-    #condition.append(1)
-#for i in h_age:
-    #condition.append(0)
-#frame1=pd.DataFrame({u"年龄":age})
-#frame2=pd.DataFrame({u"患病情况":condition})
-#frame=frame1.join(frame2)
+age=[]
+for i in d_age:
+    age.append(i)
+for i in h_age:
+    age.append(i)
+condition=[]
+for i in d_age:
+    condition.append(1)
+for i in h_age:
+    condition.append(0)
+a=[]
+for i in range(0,107):
+    a.append(i)
+count1=[]
+for i in range(0,107):
+    count1.append(0)
+for i in range(len(age)):
+    for j in a:
+        if(age[i]==j):
+            count1[j]=count1[j]+1
+count2=[]
+for i in range(0,107):
+    count2.append(0)
+for i in range(len(d_age)):
+    for j in a:
+        if(d_age[i]==j):
+            count2[j]=count2[j]+1
+result=[]
+for i in range(len(count1)):
+    if(count1[i]==0):
+        result.append(0)
+    else:
+        result.append(float(count2[i])/count1[i])
+frame1=pd.DataFrame({u"年龄":a})
+frame2=pd.DataFrame({u"患病情况":result})
 
-#from pylab import *
-#mpl.rcParams['font.sans-serif'] = ['SimHei']
-#mpl.rcParams['axes.unicode_minus'] = False 
-#fig, axis1 = plt.subplots(1,1,figsize=(45,4))
-#age = frame[[u'年龄',u'患病情况']].groupby([u'年龄'],as_index=False).mean()
-#sns.barplot(x=u'年龄', y=u'患病情况', data=age)
-##axis1.set_xticks(range(0,110,10))
-#plt.show()
+from pylab import *
+mpl.rcParams['font.sans-serif'] = ['SimHei']
+mpl.rcParams['axes.unicode_minus'] = False 
+fig, axis1 = plt.subplots(1,1,figsize=(45,4))
+age = frame[[u'年龄',u'患病情况']].groupby([u'年龄'],as_index=False).mean()
+sns.barplot(x=u'年龄', y=u'患病情况', data=age)
+#axis1.set_xticks(range(0,110,10))
+plt.show()
 
 
 
@@ -575,49 +620,49 @@ account2=db2.liuzhe
 #plt.show()
 
 
-#将diabete数据库中的饮酒情况集录入到d_drink集合中
-d_drink=[]
-for item in account1.find():
-    if item.has_key(u'饮酒情况') and item[u'饮酒情况']:
-        d_drink.append(item[u'饮酒情况'])
+##将diabete数据库中的饮酒情况集录入到d_drink集合中
+#d_drink=[]
+#for item in account1.find():
+    #if item.has_key(u'饮酒情况') and item[u'饮酒情况']:
+        #d_drink.append(item[u'饮酒情况'])
             
-#将health数据库中的吸烟情况集录入到h_drink集合中
-h_drink=[]
-for item in account2.find():
-    if item.has_key(u'饮酒情况') and item[u'饮酒情况']:
-        h_drink.append(item[u'饮酒情况'])
+##将health数据库中的吸烟情况集录入到h_drink集合中
+#h_drink=[]
+#for item in account2.find():
+    #if item.has_key(u'饮酒情况') and item[u'饮酒情况']:
+        #h_drink.append(item[u'饮酒情况'])
 
-drink=[]
-for i in d_drink:
-    drink.append(i)
-for i in h_drink:
-    drink.append(i)
-condition=[]
-for i in d_drink:
-    condition.append(1)
-for i in h_drink:
-    condition.append(0)
-frame1=pd.DataFrame({u"饮酒情况":drink})
-frame2=pd.DataFrame({u"患病情况":condition})
-frame=frame1.join(frame2)
+#drink=[]
+#for i in d_drink:
+    #drink.append(i)
+#for i in h_drink:
+    #drink.append(i)
+#condition=[]
+#for i in d_drink:
+    #condition.append(1)
+#for i in h_drink:
+    #condition.append(0)
+#frame1=pd.DataFrame({u"饮酒情况":drink})
+#frame2=pd.DataFrame({u"患病情况":condition})
+#frame=frame1.join(frame2)
 
-sibsp_df = frame[frame[u"患病情况"] != 0]
-no_sibsp_df = frame[frame[u"患病情况"] == 0]
-sns.set(style="whitegrid") 
-from pylab import *
-mpl.rcParams['font.sans-serif'] = ['SimHei']
-mpl.rcParams['axes.unicode_minus'] = False 
+#sibsp_df = frame[frame[u"患病情况"] != 0]
+#no_sibsp_df = frame[frame[u"患病情况"] == 0]
+#sns.set(style="whitegrid") 
+#from pylab import *
+#mpl.rcParams['font.sans-serif'] = ['SimHei']
+#mpl.rcParams['axes.unicode_minus'] = False 
 
-plt.figure(figsize=(10,5))
-plt.subplot(121)
-sibsp_df[u"饮酒情况"].value_counts().plot.pie(autopct = '%1.1f%%')
-plt.xlabel(u'患病')
+#plt.figure(figsize=(10,5))
+#plt.subplot(121)
+#sibsp_df[u"饮酒情况"].value_counts().plot.pie(autopct = '%1.1f%%')
+#plt.xlabel(u'患病')
 
-plt.subplot(122)
-no_sibsp_df[u"饮酒情况"].value_counts().plot.pie(autopct = '%1.1f%%')
-plt.xlabel(u'不患病')
+#plt.subplot(122)
+#no_sibsp_df[u"饮酒情况"].value_counts().plot.pie(autopct = '%1.1f%%')
+#plt.xlabel(u'不患病')
 
-plt.show()
+#plt.show()
 
 ##绘制空腹血糖与患病情况的箱型图
 ##将diabete数据库中的空腹血糖集录入到d_kfxt集合中
