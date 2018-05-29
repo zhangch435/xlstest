@@ -1,0 +1,37 @@
+##将excel数据录入到mysql数据库
+import xlrd
+import MySQLdb
+
+##工作表的路径及表名
+book = xlrd.open_workbook("D:\pytest2.xls")
+sheet = book.sheet_by_name("source")
+##创建与mysql数据库的连接
+database = MySQLdb.connect (host="localhost", user = "root", passwd = "root", db = "chenlinfeng",charset='utf8')
+##获取游标
+cursor = database.cursor()
+
+##录入的表格名称
+query = """INSERT INTO list1(customer, test,rep,date) VALUES (%s,%s, %s,%s)"""
+
+##便利每一行数据
+for r in range(0, sheet.nrows):
+    customer = sheet.cell(r,0).value
+test     = sheet.cell(r,1).value
+rep      = sheet.cell(r,2).value
+date     = sheet.cell(r,3).value
+
+values = (customer,test,rep,date)
+
+cursor.execute(query, values)
+
+cursor.close()
+##提交事务
+database.commit()
+##关闭数据库
+database.close()
+
+print ""
+print "Done! "
+print ""
+columns = str(sheet.ncols)
+rows = str(sheet.nrows)
