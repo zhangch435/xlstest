@@ -1,0 +1,50 @@
+import sys
+import json
+import xlrd
+import pymongo
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from pymongo import MongoClient, collection
+
+import warnings
+warnings.filterwarnings('ignore')
+
+#创建与mongo数据库的连接
+client=MongoClient('localhost',12345)
+db1=client.diabete
+account1=db1.linfeng
+db2=client.health  
+account2=db2.linfeng
+
+##绘制空腹血糖与患病情况的箱型图
+##将diabete数据库中的空腹血糖集录入到d_kfxt集合中
+d_kfxt=[]
+for item in account1.find():
+    if item.has_key(u'空腹血糖') and item[u'空腹血糖']:
+        d_kfxt.append(float(item[u'空腹血糖']))
+##将health数据库中的高密度脂蛋白集录入到h_kfxt集合中
+h_kfxt=[]
+for item in account2.find():
+    if item.has_key(u'空腹血糖') and item[u'空腹血糖']:
+        h_kfxt.append(float(item[u'空腹血糖'])) 
+        
+kfxt=[]
+for i in d_kfxt:
+    kfxt.append(i)
+for i in h_kfxt:
+    kfxt.append(i)
+condition=[]
+for i in d_kfxt:
+    condition.append(1)
+for i in h_kfxt:
+    condition.append(0)
+frame1=pd.DataFrame({u"患病情况":condition})
+frame2=pd.DataFrame({u"空腹血糖":kfxt})
+frame=frame1.join(frame2)
+from pylab import *
+mpl.rcParams['font.sans-serif'] = ['SimHei']
+mpl.rcParams['axes.unicode_minus'] = False 
+frame.boxplot(column=u'空腹血糖', by=u'患病情况', showfliers=False)
+plt.show()
