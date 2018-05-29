@@ -1,0 +1,19 @@
+import xlrd
+import sys
+import json
+import pymongo
+from pymongo import MongoClient
+client=MongoClient('localhost',12345)
+db=client.diabete
+account=db.linfeng
+data=xlrd.open_workbook('D:\diabete.xls')
+table=data.sheets()[0]
+rowstag=table.row_values(0)
+nrows=table.nrows
+ncols=table.ncols
+print nrows
+returnData={}
+for i in range(1,nrows):
+    returnData[i]=json.dumps(dict(zip(rowstag,table.row_values(i))))
+    returnData[i]=json.loads(returnData[i])
+    account.insert(returnData[i])
